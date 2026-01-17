@@ -72,7 +72,6 @@
         .dot-indicator { width: 6px; height: 6px; border-radius: 50%; background: #444; }
         .active-dot { background: var(--supporter); box-shadow: 0 0 10px var(--supporter); }
     </style>
-    <link rel="apple-touch-icon" href="https://media.istockphoto.com/id/1255163297/vector/user-profile-icon-vector-avatar-portrait-symbol-flat-shape-person-sign-logo-black-silhouette.jpg?s=612x612&w=0&k=20&c=p6azyhUBIcWx6-aXVRPUTveaVqbTA2bNXpBoGQjEB68=">
 </head>
 <body>
 
@@ -103,15 +102,22 @@
                 <a href="#" class="link-yt"><i class="fab fa-youtube"></i> YOUTUBE</a>
             </div>
 
-            <div id="notif-toggle" onclick="enablePush()">
+            <div id="notif-toggle">
                 <div class="dot-indicator" id="push-dot"></div>
-                ENABLE NOTIFICATIONS
+                <span id="push-text">NOTIFICATIONS: STANDBY</span>
             </div>
         </div>
     </div>
 
+    <script src="https://js.pusher.com/beams/1.0/push-notifications-cdn.js"></script>
+
     <script>
         const USER_ID = "1017725468264374383";
+
+        // Initialize Pusher Client
+        const beamsClient = new PusherPushNotifications.Client({
+            instanceId: '421875b5-0249-4086-8091-bb666100cf6d',
+        });
 
         async function sync() {
             try {
@@ -121,12 +127,9 @@
                 ]);
                 const l = (await lRes.json()).data;
                 const d = await dRes.json();
-
                 document.getElementById('display-name').innerText = d.user.global_name || d.user.username;
-                
                 const pExt = d.user.avatar.startsWith('a_') ? 'gif' : 'png';
                 document.getElementById('user-pfp').src = `https://cdn.discordapp.com/avatars/${USER_ID}/${d.user.avatar}.${pExt}?size=256`;
-
                 const dot = document.getElementById('status-dot');
                 dot.style.background = `var(--${l.discord_status})`;
                 dot.style.boxShadow = `0 0 10px var(--${l.discord_status})`;
@@ -146,13 +149,27 @@
             } catch(e) {}
         }
 
+        // ENTRY FUNCTION (Triggered by Splash Click)
         function entry() {
             document.getElementById('splash').style.opacity = '0';
             setTimeout(() => {
                 document.getElementById('splash').style.display = 'none';
                 document.getElementById('ui').style.opacity = '1';
                 document.getElementById('ui').style.transform = 'translateY(0)';
+                
+                // 1. Run Discord Sync
                 sync();
+
+                // 2. Start Notifications immediately on click
+                beamsClient.start()
+                    .then(() => beamsClient.addDeviceInterest('status-updates'))
+                    .then(() => {
+                        document.getElementById('push-dot').classList.add('active-dot');
+                        document.getElementById('push-text').innerText = "NOTIFICATIONS: ACTIVE";
+                        document.getElementById('push-text').style.color = "#fff";
+                        alert("Elite V8: Notifications are now Linked!");
+                    })
+                    .catch(err => console.error("Notification Error:", err));
             }, 600);
         }
 
@@ -161,26 +178,6 @@
         });
 
         setInterval(sync, 5000);
-    </script>
-
-    <script src="https://js.pusher.com/beams/1.0/push-notifications-cdn.js"></script>
-    <script>
-      const beamsClient = new PusherPushNotifications.Client({
-        instanceId: '421875b5-0249-4086-8091-bb666100cf6d',
-      });
-
-      function enablePush() {
-          beamsClient.start()
-            .then(() => beamsClient.addDeviceInterest('status-updates'))
-            .then(() => {
-                document.getElementById('push-dot').classList.add('active-dot');
-                document.getElementById('notif-toggle').style.color = "#fff";
-                alert("Elite V8: Notifications are now Linked!");
-            })
-            .catch((err) => {
-                console.error("Setup failed:", err);
-            });
-      }
     </script>
 </body>
 </html>
