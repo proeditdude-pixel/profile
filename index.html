@@ -191,20 +191,18 @@
 
         setInterval(sync, 5000);
     </script>
-   <script src="https://js.pusher.com/beams/1.0/push-notifications-cdn.js"></script>
-<script>
-  const beamsClient = new PusherPushNotifications.Client({
-    instanceId: '421875b5-0249-4086-8091-bb666100cf6d',
-  });
+      </div> <script src="https://js.pusher.com/beams/1.0/push-notifications-cdn.js"></script>
+    <script>
+      const beamsClient = new PusherPushNotifications.Client({
+        instanceId: '421875b5-0249-4086-8091-bb666100cf6d',
+      });
 
-  beamsClient.start()
-    .then(() => beamsClient.addDeviceInterest('status-updates'))
-    .then(() => {
-        alert("Elite V8: Notifications are now Linked!"); 
-    })
-    .catch(console.error);
-</script>
-
-
+      beamsClient.start()
+        .then(() => beamsClient.addDeviceInterest('status-updates'))
+        .then(() => {
+            alert("Elite V8: Notifications are now Linked!"); 
+        })
+        .catch(console.error);
+    </script>
 </body>
 </html>
