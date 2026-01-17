@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+        
+        :root { 
+            --online: #43b581; --idle: #faa61a; --dnd: #f04747; --offline: #747f8d;
+            --verified: #3897f0; --premium: #b452ff; --partner: #ffaa00; 
+            --supporter: #00f2ff; --discord: #5865F2; --insta: #E1306C; 
+            --yt-red: #ff0000; --glass: rgba(5, 5, 5, 0.95); 
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; }
+        body { background: #000; font-family: 'JetBrains Mono', monospace; color: white; overflow: hidden; height: 100vh; display: flex; justify-content: center; align-items: center; }
+
+        #cursor { width: 6px; height: 6px; background: #fff; border-radius: 50%; position: fixed; pointer-events: none; z-index: 10000; box-shadow: 0 0 15px #fff; }
+
+        #splash { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; justify-content: center; align-items: center; cursor: pointer; }
+        #splash span { letter-spacing: 10px; font-size: 12px; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+
+        #ui { opacity: 0; transform: translateY(20px); transition: 1.5s cubic-bezier(0.19, 1, 0.22, 1); }
+        .card { 
+            background: var(--glass); width: 340px; border-radius: 30px; 
+            border: 1px solid rgba(255, 255, 255, 0.05); 
+            padding-bottom: 25px; overflow: hidden; position: relative; 
+            box-shadow: 0 30px 60px rgba(0,0,0,0.8);
+        }
+
+        .banner { width: 100%; height: 120px; background: #080808; overflow: hidden; }
+        #user-banner { width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: 1.2s; }
+
+        .pfp-area { position: relative; width: 90px; height: 90px; margin: -45px auto 0 auto; z-index: 10; }
+        .pfp-main { width: 100%; height: 100%; border-radius: 50%; border: 4px solid #050505; overflow: hidden; background: #000; }
+        #user-pfp { width: 100%; height: 100%; object-fit: cover; }
+        .dc-dot { position: absolute; bottom: 2px; right: 2px; width: 20px; height: 20px; border-radius: 50%; border: 4px solid #050505; }
+
+        .status-bubble {
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);
+            padding: 6px 12px; border-radius: 10px; margin: 15px auto 0 auto;
+            width: fit-content; max-width: 80%; opacity: 0; transition: 0.5s;
+        }
+
+        .display-name { text-align: center; margin-top: 10px; font-size: 20px; letter-spacing: 2px; font-weight: 700; color: #fff; }
+
+        .badge-row { display: flex; justify-content: center; gap: 15px; margin-top: 15px; }
+        .badge { font-size: 16px; filter: drop-shadow(0 0 5px currentColor); }
+
+        .links { width: 100%; padding: 0 40px; margin-top: 20px; }
+        .links a { 
+            display: flex; align-items: center; justify-content: center; gap: 10px; 
+            width: 100%; padding: 12px; margin: 8px 0; border-radius: 12px; 
+            background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.03);
+            color: #888; text-decoration: none; font-size: 10px; font-weight: 700; 
+            letter-spacing: 1px; transition: 0.3s; 
+        }
+        .link-dc:hover { color: #fff; border-color: var(--discord); box-shadow: 0 0 15px var(--discord); }
+        .link-ig:hover { color: #fff; border-color: var(--insta); box-shadow: 0 0 15px var(--insta); }
+        .link-yt:hover { color: #fff; border-color: var(--yt-red); box-shadow: 0 0 15px var(--yt-red); }
+
+        #notif-toggle {
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            margin: 20px auto 0 auto; font-size: 8px; color: #444; cursor: pointer;
+            text-transform: uppercase; letter-spacing: 1px; transition: 0.3s;
+        }
+        .dot-indicator { width: 6px; height: 6px; border-radius: 50%; background: #444; }
+        .active-dot { background: var(--supporter); box-shadow: 0 0 10px var(--supporter); }
+    </style>
+</head>
+<body>
+
+    <div id="cursor"></div>
+    <div id="splash" onclick="entry()"><span>CLICK TO ENTER</span></div>
+
+    <div id="ui">
+        <div class="card">
+            <div class="banner"><img id="user-banner" src=""></div>
+            <div class="pfp-area">
+                <div class="pfp-main"><img id="user-pfp" src=""></div>
+                <div id="status-dot" class="dc-dot"></div>
+            </div>
+            <div id="bubble" class="status-bubble"><p id="bio" style="font-size:8px; color:#aaa; text-align: center;"></p></div>
+            
+            <h1 class="display-name" id="display-name">...</h1>
+
+            <div class="badge-row">
+                <i class="fas fa-certificate badge" style="color:var(--verified)"></i>
+                <i class="fas fa-gem badge" style="color:var(--premium)"></i>
+                <i class="fas fa-star badge" style="color:var(--partner)"></i>
+                <i class="fas fa-bolt badge" style="color:var(--supporter)"></i>
+            </div>
+            
+            <div class="links">
+                <a href="#" class="link-dc"><i class="fab fa-discord"></i> DISCORD</a>
+                <a href="#" class="link-ig"><i class="fab fa-instagram"></i> INSTAGRAM</a>
+                <a href="#" class="link-yt"><i class="fab fa-youtube"></i> YOUTUBE</a>
+            </div>
+
+            <div id="notif-toggle" onclick="enablePush()">
+                <div class="dot-indicator" id="push-dot"></div>
+                ENABLE NOTIFICATIONS
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const USER_ID = "1017725468264374383";
+
+        // Register Service Worker for Notifications
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+
+        async function sync() {
+            try {
+                const [lRes, dRes] = await Promise.all([
+                    fetch(`https://api.lanyard.rest/v1/users/${USER_ID}`),
+                    fetch(`https://dcdn.dstn.to/profile/${USER_ID}`)
+                ]);
+                const l = (await lRes.json()).data;
+                const d = await dRes.json();
+
+                document.getElementById('display-name').innerText = d.user.global_name || d.user.username;
+                
+                const pExt = d.user.avatar.startsWith('a_') ? 'gif' : 'png';
+                document.getElementById('user-pfp').src = `https://cdn.discordapp.com/avatars/${USER_ID}/${d.user.avatar}.${pExt}?size=256`;
+
+                const dot = document.getElementById('status-dot');
+                dot.style.background = `var(--${l.discord_status})`;
+                dot.style.boxShadow = `0 0 10px var(--${l.discord_status})`;
+
+                if(d.user.banner) {
+                    const bExt = d.user.banner.startsWith('a_') ? 'gif' : 'png';
+                    const b = document.getElementById('user-banner');
+                    b.src = `https://cdn.discordapp.com/banners/${USER_ID}/${d.user.banner}.${bExt}?size=1024`;
+                    b.style.opacity = '0.5';
+                }
+
+                let custom = l.activities.find(a => a.type === 4);
+                if (custom) {
+                    document.getElementById('bio').innerText = `${custom.emoji ? custom.emoji.name : ''} ${custom.state || ''}`.toUpperCase();
+                    document.getElementById('bubble').style.opacity = "1";
+                }
+            } catch(e) {}
+        }
+
+        function enablePush() {
+            Notification.requestPermission().then(p => {
+                if(p === 'granted') {
+                    document.getElementById('push-dot').classList.add('active-dot');
+                    document.getElementById('notif-toggle').style.color = "#fff";
+                    new Notification("Profile System", { body: "Notifications are now active!" });
+                }
+            });
+        }
+
+        function entry() {
+            document.getElementById('splash').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('splash').style.display = 'none';
+                document.getElementById('ui').style.opacity = '1';
+                document.getElementById('ui').style.transform = 'translateY(0)';
+                sync();
+            }, 600);
+        }
+
+        document.addEventListener('mousemove', (e) => {
+            gsap.to("#cursor", { x: e.clientX, y: e.clientY, duration: 0.1 });
+        });
+
+        setInterval(sync, 5000);
+    </script>
+</body>
+</html>
