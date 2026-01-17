@@ -73,8 +73,6 @@
         .active-dot { background: var(--supporter); box-shadow: 0 0 10px var(--supporter); }
     </style>
     <link rel="apple-touch-icon" href="https://media.istockphoto.com/id/1255163297/vector/user-profile-icon-vector-avatar-portrait-symbol-flat-shape-person-sign-logo-black-silhouette.jpg?s=612x612&w=0&k=20&c=p6azyhUBIcWx6-aXVRPUTveaVqbTA2bNXpBoGQjEB68=">
-<script src="https://js.pusher.com/beams/1.0/push-notifications-cdn.js"></script>
-
 </head>
 <body>
 
@@ -115,11 +113,6 @@
     <script>
         const USER_ID = "1017725468264374383";
 
-        // Register Service Worker for Notifications
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js');
-        }
-
         async function sync() {
             try {
                 const [lRes, dRes] = await Promise.all([
@@ -153,16 +146,6 @@
             } catch(e) {}
         }
 
-        function enablePush() {
-            Notification.requestPermission().then(p => {
-                if(p === 'granted') {
-                    document.getElementById('push-dot').classList.add('active-dot');
-                    document.getElementById('notif-toggle').style.color = "#fff";
-                    new Notification("Profile System", { body: "User is now online!" });
-                }
-            });
-        }
-
         function entry() {
             document.getElementById('splash').style.opacity = '0';
             setTimeout(() => {
@@ -179,21 +162,25 @@
 
         setInterval(sync, 5000);
     </script>
-     </div>
+
     <script src="https://js.pusher.com/beams/1.0/push-notifications-cdn.js"></script>
     <script>
       const beamsClient = new PusherPushNotifications.Client({
         instanceId: '421875b5-0249-4086-8091-bb666100cf6d',
       });
 
-      beamsClient.start()
-        .then(() => beamsClient.addDeviceInterest('status-updates'))
-        .then(() => {
-          alert("Elite V8: Notifications are now Linked!");
-        })
-        .catch((err) => {
-          console.error("Setup failed:", err);
-        });
+      function enablePush() {
+          beamsClient.start()
+            .then(() => beamsClient.addDeviceInterest('status-updates'))
+            .then(() => {
+                document.getElementById('push-dot').classList.add('active-dot');
+                document.getElementById('notif-toggle').style.color = "#fff";
+                alert("Elite V8: Notifications are now Linked!");
+            })
+            .catch((err) => {
+                console.error("Setup failed:", err);
+            });
+      }
     </script>
 </body>
 </html>
