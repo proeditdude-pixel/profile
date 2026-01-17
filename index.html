@@ -74,18 +74,6 @@
     </style>
     <link rel="apple-touch-icon" href="https://media.istockphoto.com/id/1255163297/vector/user-profile-icon-vector-avatar-portrait-symbol-flat-shape-person-sign-logo-black-silhouette.jpg?s=612x612&w=0&k=20&c=p6azyhUBIcWx6-aXVRPUTveaVqbTA2bNXpBoGQjEB68=">
 <script src="https://js.pusher.com/beams/1.0/push-notifications-cdn.js"></script>
-<script>
-  const beamsClient = new PusherPushNotifications.Client({
-    instanceId: '421875b5-0249-4086-8091-bb666100cf6d',
-  });
-
-  beamsClient.start()
-    .then(() => beamsClient.addDeviceInterest('status-updates'))
-    .then(() => {
-        alert("Elite V8: Notifications are now Linked!"); 
-    })
-    .catch(console.error);
-</script>
 
 </head>
 <body>
