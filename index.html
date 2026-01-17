@@ -73,7 +73,7 @@
         .active-dot { background: var(--supporter); box-shadow: 0 0 10px var(--supporter); }
     </style>
     <link rel="apple-touch-icon" href="https://media.istockphoto.com/id/1255163297/vector/user-profile-icon-vector-avatar-portrait-symbol-flat-shape-person-sign-logo-black-silhouette.jpg?s=612x612&w=0&k=20&c=p6azyhUBIcWx6-aXVRPUTveaVqbTA2bNXpBoGQjEB68=">
-
+<script src="https://js.pusher.com/beams/2.1.0/push-notifications-cdn.js"></script>
 </head>
 <body>
 
@@ -178,5 +178,21 @@
 
         setInterval(sync, 5000);
     </script>
+    <script>
+  const beamsClient = new PusherPushNotifications.Client({
+    instanceId: '421875b5-0249-4086-8091-bb666100cf6d',
+  });
+
+  beamsClient.start()
+    .then(() => beamsClient.addDeviceInterest('status-updates')) // Change this
+    .then(() => {
+        // --- ADD THIS LINE BELOW ---
+        alert("Elite V8: Notifications are now Linked!"); 
+        // ---------------------------
+        console.log('Successfully registered!');
+    })
+    .catch(console.error);
+</script>
+
 </body>
 </html>
